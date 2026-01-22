@@ -1,0 +1,42 @@
+windows-explorer/
+│
+├── backend/
+│   ├── src/
+│   │   ├── app.ts
+│   │   ├── index.ts
+│   │   ├── controllers/
+│   │   │   └── folder.controller.ts
+│   │   ├── services/
+│   │   │   └── folder.service.ts
+│   │   ├── repositories/
+│   │   │   └── folder.repository.ts
+│   │   ├── routes/
+│   │   │   └── folder.routes.ts
+│   │   ├── db/
+│   │   │   └── prisma.ts
+│   │   └── types/
+│   │       └── folder.ts
+│   ├── prisma/
+│   │   └── schema.prisma
+│   ├── package.json (kalau Node)
+│   ├── bun.lock (kalau Bun)
+│   ├── tsconfig.json
+│   └── README.md
+│
+└── frontend/
+    ├── src/
+    │   ├── components/
+    │   │   ├── FolderTree.vue
+    │   │   ├── FolderItem.vue
+    │   │   └── RightPanel.vue
+    │   ├── pages/
+    │   │   └── Explorer.vue
+    │   ├── api/
+    │   │   └── folderApi.ts
+    │   ├── composables/
+    │   │   └── useFolder.ts
+    │   ├── App.vue
+    │   └── main.ts
+    ├── vite.config.ts
+    ├── package.json / bun.lock
+    └── README.md
