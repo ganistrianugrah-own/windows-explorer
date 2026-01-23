@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Form Pembayaran SPP</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f5f7fb;
+        padding: 20px;
+    }
+    .container {
+        max-width: 450px;
+        margin: auto;
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+    }
+    label {
+        font-weight: bold;
+        margin-top: 10px;
+        display: block;
+    }
+    input, select {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+    }
+    button {
+        width: 100%;
+        background: #4e73df;
+        color: white;
+        padding: 12px;
+        border-radius: 8px;
+        border: none;
+        font-size: 16px;
+        margin-top: 20px;
+        cursor: pointer;
+    }
+    button:hover {
+        background: #3b5bcc;
+    }
+    .success {
+        margin-top: 15px;
+        text-align: center;
+        color: green;
+        font-weight: bold;
+        display: none;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Form Pembayaran SPP</h2>
+
+    <form id="sppForm">
+        <label>Nama</label>
+        <input type="text" name="nama" required>
+
+        <label>Kelas</label>
+        <input type="text" name="kelas" required>
+
+        <label>Pembayaran SPP Bulan</label>
+        <select name="bulan" required>
+            <option value="">-- Pilih Bulan --</option>
+            <option>Januari 2025</option>
+            <option>Februari 2025</option>
+            <option>Maret 2025</option>
+            <option>April 2025</option>
+            <option>Mei 2025</option>
+            <option>Juni 2025</option>
+            <option>Juli 2025</option>
+            <option>Agustus 2025</option>
+            <option>September 2025</option>
+            <option>Oktober 2025</option>
+            <option>November 2025</option>
+            <option>Desember 2025</option>
+        </select>
+
+        <label>Jumlah</label>
+        <input type="number" name="jumlah" required>
+
+        <label>Bukti Pembayaran (Image/PDF)</label>
+        <input type="file" name="bukti" accept="image/*,application/pdf" required>
+
+        <button type="submit">Kirim</button>
+    </form>
+
+    <p class="success" id="successMsg">Pembayaran berhasil dikirim!</p>
+</div>
+
+<script>
+document.getElementById("sppForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    let formData = new FormData(e.target);
+
+    const scriptURL = "PASTE_URL_WEB_APP"; // ganti setelah deploy Apps Script
+
+    let response = await fetch(scriptURL, {
+        method: "POST",
+        body: formData
+    });
+
+    if (response.ok) {
+        document.getElementById("successMsg").style.display = "block";
+        e.target.reset();
+    }
+});
+</script>
+
+</body>
+</html>

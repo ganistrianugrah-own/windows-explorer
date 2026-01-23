@@ -1,33 +1,47 @@
 <?php
+error_reporting(0);
+ini_set('display_errors', 0);
 header('Content-Type: application/json');
-require_once 'db_config.php';
 
-$source_id = $_POST['source_id'];
-$target_parent_id = $_POST['target_parent_id'];
-$type = $_POST['type'];
+include 'db_config.php';
+
+$source_id = $_POST['source_id'] ?? null;
+$target_id = $_POST['target_parent_id'] ?? null;
+$type      = $_POST['type'] ?? null;
+$mode      = $_POST['mode'] ?? null;
+
+if (!$source_id || !$target_id) {
+    echo json_encode(['status' => 'error', 'message' => 'Data tidak lengkap']);
+    exit;
+}
+
+$db_target = ($target_id === 'NULL' || $target_id === '') ? "NULL" : "'$target_id'";
 
 if ($type === 'folder') {
-    // Copy Folder Logic
-    $res = $conn->query("SELECT name FROM folders WHERE id = $source_id")->fetch_assoc();
-    $newName = $res['name'] . " - Copy";
-    $parent = ($target_parent_id === 'NULL') ? "NULL" : $target_parent_id;
-
-    $stmt = $conn->prepare("INSERT INTO folders (name, parent_id) VALUES (?, $parent)");
-    $stmt->bind_param("s", $newName);
-    if($stmt->execute()) echo json_encode(['status' => 'success']);
-
-} else if ($type === 'file') {
-    // Copy File Logic (DB + Fisik)
-    $res = $conn->query("SELECT * FROM files WHERE id = $source_id")->fetch_assoc();
-    $oldPath = $res['path'];
-    $newName = "Copy_of_" . $res['name'];
-    $newPath = "uploads/" . time() . "_" . $newName;
-
-    // Duplikasi File Fisik
-    if (copy($oldPath, $newPath)) {
-        $stmt = $conn->prepare("INSERT INTO files (name, folder_id, path, size) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("sisi", $newName, $target_parent_id, $newPath, $res['size']);
-        if($stmt->execute()) echo json_encode(['status' => 'success']);
+    if ($mode === 'cut') {
+        // Jika CUT: Pindahkan saja tanpa ubah nama
+        $query = "UPDATE folders SET parent_id = $db_target WHERE id = '$source_id'";
+    } else {
+        // Jika COPY: Ambil nama asli lalu tambahkan ' - Copy'
+        $query = "INSERT INTO folders (name, parent_id) 
+                  SELECT CONCAT(name, ' - Copy'), $db_target 
+                  FROM folders WHERE id = '$source_id'";
     }
+} else {
+    if ($mode === 'cut') {
+        // Jika CUT: Pindahkan saja
+        $query = "UPDATE files SET folder_id = $db_target WHERE id = '$source_id'";
+    } else {
+        // Jika COPY: Ambil nama asli lalu tambahkan ' - Copy'
+        $query = "INSERT INTO files (name, path, folder_id) 
+                  SELECT CONCAT(name, ' - Copy'), path, $db_target 
+                  FROM files WHERE id = '$source_id'";
+    }
+}
+
+if (mysqli_query($conn, $query)) {
+    echo json_encode(['status' => 'success']);
+} else {
+    echo json_encode(['status' => 'error', 'message' => mysqli_error($conn)]);
 }
 ?>

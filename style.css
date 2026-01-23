@@ -5,6 +5,7 @@ body {
     display: flex; 
     height: 100vh; 
     background: #fff; 
+    overflow: hidden; /* Mencegah scroll di seluruh body */
 }
 
 /* --- SIDEBAR KIRI --- */
@@ -14,7 +15,7 @@ body {
     border-right: 1px solid #ddd; 
     display: flex; 
     flex-direction: column; 
-    flex-shrink: 0;
+    height: 100vh; 
 }
 
 .sidebar-header { 
@@ -23,6 +24,15 @@ body {
     font-size: 11px; 
     color: #888; 
     text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+/* Area Scrollbar Sidebar */
+.sidebar-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0 10px;
 }
 
 #folder-tree, .nested {
@@ -60,66 +70,118 @@ body {
     flex-shrink: 0;
 }
 
-/* Warna Ikon */
 .folder-icon { margin-right: 8px; font-size: 16px; }
-.root-folder { color: #00070c; font-weight: bold; } /* Biru untuk Root */
-.sub-folder { color: #4a4a48; } /* Kuning untuk Sub */
 
 /* --- PANEL KANAN --- */
-#main-content { flex: 1; display: flex; flex-direction: column; }
-/* Update Address Bar agar Kiri & Kanan terpisah */
+#main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; }
+
 .address-bar { 
     display: flex;
     align-items: center;
     justify-content: space-between;
     height: 50px;
     padding: 0 15px;
-    border-bottom: 1px solid #0e0e0e;
+    border-bottom: 1px solid #ddd;
     background: #fff;
+    flex-shrink: 0;
 }
 
-.address-left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    
+.address-left { display: flex; align-items: center; gap: 10px; }
+
+#file-grid { 
+    flex: 1; 
+    padding: 30px; 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
+    gap: 20px; 
+    overflow-y: auto; /* Scrollbar Grid Kanan */
+    align-content: start;
 }
 
-.address-right {
-    display: flex;
-    align-items: center;
+/* Context Menu - Harus Absolute agar nempel kursor */
+#context-menu {
+    position: absolute;
+    background: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+    display: none;
+    z-index: 10000;
+    width: 170px;
+    border-radius: 4px;
+    padding: 5px 0;
 }
 
-/* Styling Kotak Search */
-#search-input {
-    padding: 6px 15px;
-    border: 1px solid #ddd;
-    border-radius: 20px; /* Membuat lonjong ala Windows 11 */
-    outline: none;
-    width: 200px;
+.menu-item {
+    padding: 8px 15px;
     font-size: 13px;
-    transition: all 0.3s ease;
+    cursor: pointer;
 }
 
-#search-input:focus {
-    border-color: #0078d7;
-    width: 280px; /* Melebar saat diketik */
-    box-shadow: 0 0 5px rgba(0, 120, 215, 0.2);
-}
-/* Styling Breadcrumb agar bisa diklik */
-#breadcrumb { 
+.menu-item:hover { background: #f0f0f0; }
+.menu-item.red { color: red; }
+
+.item-card { 
     display: flex; 
+    flex-direction: column; 
     align-items: center; 
-    gap: 5px; 
-    font-size: 13px; 
-    color: #333; 
+    text-align: center; 
+    padding: 10px; 
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.item-card {
+    width: 120px; /* Atur lebar tetap */
+    text-align: center;
+    padding: 10px;
+    overflow: hidden;
+}
+
+.item-card .name {
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Ini yang bikin nama rapi pakai ... */
+    margin-top: 5px;
+    font-size: 12px;
+}
+
+/* Biar kalau di-hover muncul nama lengkapnya */
+.item-card:hover .name {
+    white-space: normal;
+    word-break: break-all;
+    overflow: visible;
+}
+
+.item-card.selected {
+    background: #e5f3ff !important;
+    border: 1px solid #99d1ff !important;
+}
+
+.search-badge {
+    font-size: 10px;
+    background: #e1f5fe;
+    color: #039be5;
+    padding: 2px 5px;
+    border-radius: 4px;
+    margin-top: 5px;
+}
+#breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+    color: #333;
+    overflow-x: auto;
+    white-space: nowrap;
 }
 
 .breadcrumb-item {
     padding: 2px 6px;
-    border-radius: 3px;
-    cursor: pointer;
-    color: #0078d7;
+    border-radius: 4px;
+    cursor: pointer; /* Kursor tangan */
+    color: #0078d7;  /* Warna biru link */
     transition: background 0.2s;
 }
 
@@ -130,68 +192,20 @@ body {
 
 .breadcrumb-separator {
     color: #ccc;
-    font-size: 10px;
+    user-select: none;
 }
 
-#file-grid { 
-    flex: 1; 
-    padding: 30px; 
-    display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
-    gap: 20px; 
-    overflow-y: auto;
-    align-content: start;
-}
-
-.item-card { 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    text-align: center; 
-    padding: 10px; 
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-/* Styling Context Menu */
-.context-menu {
-    position: absolute;
-    background: #fff;
-    border: 1px solid #ccc;
-    box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
-    display: none; /* Sembunyi secara default */
-    z-index: 1000;
-    width: 150px;
-    border-radius: 4px;
-    padding: 5px 0;
-}
-
-.menu-item {
-    padding: 8px 15px;
-    font-size: 13px;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-/* Gaya untuk folder yang diklik sekali */
-.item-card.selected {
+.item-card.drag-over {
     background: #e5f3ff !important;
-    outline: 1px solid #99d1ff !important;
+    border: 2px dashed #0078d7 !important;
 }
 
-/* Memastikan menu context menu tampil di atas segalanya */
-#context-menu {
-    position: fixed; /* Gunakan fixed agar posisi lebih akurat */
-    background: white;
-    border: 1px solid #ddd;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    z-index: 9999;
+.item-card.selected {
+    background-color: #e5f3ff !important;
+    border: 1px solid #0078d7 !important;
 }
 
-.menu-item:hover { background: #f0f0f0; }
-.menu-item.red { color: red; }
-.menu-item.red:hover { background: #fff0f0; }
-
-.item-card:hover { background: #e8f3ff; outline: 1px solid #b3d7ff; }
-.icon-large { font-size: 45px; color: #ffca28; margin-bottom: 5px; }
-.name { font-size: 12px; color: #333; }
+/* Scrollbar Styling */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #aaa; }
