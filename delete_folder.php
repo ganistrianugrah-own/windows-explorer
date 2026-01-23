@@ -10,8 +10,6 @@ if (empty($id)) {
 }
 
 try {
-    // 1. Hapus dulu semua file di dalam folder ini (opsional, tergantung struktur DB)
-    // 2. Hapus folder itu sendiri
     $sql = "DELETE FROM folders WHERE id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $id);

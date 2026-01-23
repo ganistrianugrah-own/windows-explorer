@@ -21,7 +21,7 @@
                 <button onclick="createNewFolder()" title="New Folder">➕ Folder</button>
                 <button onclick="document.getElementById('file-upload').click()">📤 Upload File</button>
                 <input type="file" id="file-upload" style="display:none" onchange="uploadFile(this)">
-                <div id="breadcrumb">Root</div>
+                <div id="breadcrumb">root</div>
             </div>
 
             <div class="address-right">

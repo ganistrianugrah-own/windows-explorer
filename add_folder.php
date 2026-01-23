@@ -1,5 +1,4 @@
 <?php
-// Pastikan tidak ada output apapun sebelum header
 require_once 'db_config.php';
 
 header('Content-Type: application/json');
@@ -13,7 +12,7 @@ if (empty($name)) {
 }
 
 try {
-    // Logika: Jika parent_id adalah string 'NULL', maka masukkan NULL ke database
+
     if ($parent_id === 'NULL' || $parent_id === '' || $parent_id === null) {
         $sql = "INSERT INTO folders (name, parent_id) VALUES (?, NULL)";
         $stmt = $conn->prepare($sql);

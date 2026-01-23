@@ -105,7 +105,7 @@ function renderBreadcrumb() {
     });
 }
 
-// 3. LOAD CONTENT & DRAG DROP
+// 3. BUAT LOAD CONTEN
 async function loadContent(id, name) {
     if (id === 'NULL') {
         gridEl.innerHTML = '<div style="padding:20px; color:gray;">Pilih folder...</div>';
@@ -117,18 +117,18 @@ async function loadContent(id, name) {
         const data = await response.json();
         gridEl.innerHTML = '';
 
-        // 1. Render Folder
+
         data.folders.forEach(item => {
             const card = createItemCard(item.id, 'folder', '📁', item.name);
-            // Double click masuk ke folder
+
             card.ondblclick = () => selectFolder(null, item.id, item.name, false);
             gridEl.appendChild(card);
         });
 
-        // 2. Render File
+
         data.files.forEach(file => {
             const card = createItemCard(file.id, 'file', '📄', file.name);
-            // Double click buka file di tab baru
+
             card.ondblclick = () => {
                 if (file.path) {
                     window.open(file.path, '_blank');
@@ -139,7 +139,7 @@ async function loadContent(id, name) {
             gridEl.appendChild(card);
         });
 
-        // Jika folder kosong
+
         if (data.folders.length === 0 && data.files.length === 0) {
             gridEl.innerHTML = '<div style="padding:20px; color:gray;">Folder ini kosong</div>';
         }
@@ -160,9 +160,9 @@ function createItemCard(id, type, icon, name) {
     
     card.onclick = (e) => { e.stopPropagation(); highlightItem(card, id, type); };
     if (type === 'folder') card.ondblclick = () => selectFolder(null, id, name, false);
-    else card.ondblclick = () => { /* open file logic */ };
+    else card.ondblclick = () => {  };
 
-    // DRAG LOGIC
+
     card.ondragstart = (e) => {
         highlightItem(card, id, type);
         e.dataTransfer.setData("text/plain", id);
@@ -193,7 +193,7 @@ function highlightItem(el, id, type) {
     selectedType = type;
 }
 
-// 4. SEARCH & NEW FOLDER (TOMBOL ATAS)
+// 4. SEARCH
 async function searchFolder() {
     const keyword = searchInput.value.toLowerCase();
     if (keyword.trim() === '') {
@@ -214,7 +214,7 @@ async function createNewFolder() {
     await handleMenuAction('new');
 }
 
-//UPOLOAD
+// UPLOAD
 async function uploadFile(input) {
     const files = input.files;
     if (files.length === 0) return;
@@ -233,7 +233,6 @@ async function uploadFile(input) {
     fd.append('file', files[0]);
     fd.append('folder_id', currentFolder.id);
 
-    // Beri indikasi memuat
     gridEl.innerHTML = 'Sedang mengunggah...';
 
     try {
@@ -246,7 +245,7 @@ async function uploadFile(input) {
         
         if (result.status === 'success') {
             alert("Upload Berhasil!");
-            // Refresh konten folder saat ini
+    
             loadContent(currentFolder.id, currentFolder.name);
         } else {
             alert("Gagal Upload: " + result.message);
@@ -258,7 +257,7 @@ async function uploadFile(input) {
         loadContent(currentFolder.id, currentFolder.name);
     }
     
-    input.value = ''; // Reset input file
+    input.value = ''; 
 }
 
 // 5. ACTIONS
@@ -267,12 +266,11 @@ async function handleMenuAction(action) {
     const menu = document.getElementById('context-menu');
     if (menu) menu.style.display = 'none';
 
-    // 1. ACTION NEW FOLDER
+    // 1. FOLDER BARU
     if (action === 'new') {
         const name = prompt("Nama folder baru:");
         if (name && name.trim() !== "") {
-            // PERBAIKAN: Pastikan pId benar-benar valid. 
-            // Jika yang dipilih bukan folder, atau tidak ada yang dipilih, pakai folder aktif saat ini.
+
             let pId = (selectedType === 'folder' && selectedId) ? selectedId : currentFolder.id;
             
             await executeAction('add_folder.php', { 
@@ -281,7 +279,7 @@ async function handleMenuAction(action) {
             });
         }
     } 
-    // 2. ACTION COPY / CUT
+    // 2. COPY CUT
     else if (action === 'copy' || action === 'cut') {
         if (!selectedId) return alert("Pilih item!");
         clipboard = { id: selectedId, type: selectedType, isCut: (action === 'cut') };
@@ -292,7 +290,7 @@ async function handleMenuAction(action) {
             if (active) active.style.opacity = "0.5";
         }
     } 
-    // 3. ACTION PASTE
+    // 3. PASTE
     else if (action === 'paste') {
         if (isPasting || !clipboard.id) {
             alert("Clipboard kosong! Copy atau Cut file terlebih dahulu.");
@@ -301,9 +299,6 @@ async function handleMenuAction(action) {
         
         isPasting = true;
         
-        // LOGIKA PENENTUAN TARGET:
-        // 1. Jika user klik kanan di sebuah FOLDER, masukkan ke dalam folder itu.
-        // 2. Jika user klik di area kosong, masukkan ke folder yang sedang dibuka (navigationPath).
         let targetId;
         if (selectedType === 'folder' && selectedId) {
             targetId = selectedId;
@@ -311,14 +306,14 @@ async function handleMenuAction(action) {
             targetId = currentFolder.id;
         }
 
-        // Jangan izinkan paste ke diri sendiri (misal folder A di-cut lalu di-paste ke folder A)
+        // Gak bisa paste di file sendiri
         if (clipboard.type === 'folder' && String(clipboard.id) === String(targetId)) {
             alert("Tidak bisa memindahkan folder ke dalam dirinya sendiri!");
             isPasting = false;
             return;
         }
 
-        console.log("Memindahkan ID:", clipboard.id, "Ke Folder:", targetId); // Untuk cek di Console F12
+        console.log("Memindahkan ID:", clipboard.id, "Ke Folder:", targetId);
 
         await executeAction('paste_item.php', { 
             source_id: clipboard.id, 
@@ -327,14 +322,14 @@ async function handleMenuAction(action) {
             mode: clipboard.isCut ? 'cut' : 'copy' 
         });
 
-        // Jika mode CUT, kosongkan clipboard setelah sukses
+
         if (clipboard.isCut) {
             clipboard = { id: null, type: null, isCut: false };
         }
         
         isPasting = false;
     }
-    // 4. ACTION RENAME
+    // 4. RENAME
     else if (action === 'rename') {
         if (!selectedId) return alert("Pilih item yang ingin diubah namanya!");
         const n = prompt("Nama baru:", "");
@@ -343,7 +338,7 @@ async function handleMenuAction(action) {
             await executeAction(url, { id: selectedId, name: n.trim() });
         }
     }
-    // 5. ACTION DELETE
+    // 5. DELETE
     else if (action === 'delete') {
         if (!selectedId) return alert("Pilih item yang ingin dihapus!");
         if (confirm(`Hapus ${selectedType} ini?`)) {
@@ -368,17 +363,17 @@ async function executeAction(url, data) {
 
 // 6. LISTENERS
 document.addEventListener('keydown', async (e) => {
-    // 1. Abaikan jika sedang mengetik di input/search/prompt
+
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
-    // 2. Shortcut PASTE (Ctrl + V) - Tetap jalan meski tidak ada yang dipilih (targetnya folder aktif)
+    
     if (e.ctrlKey && e.key.toLowerCase() === 'v') {
         e.preventDefault();
         console.log("Shortcut Paste ditekan");
         await handleMenuAction('paste');
     }
 
-    // 3. Shortcut COPY (Ctrl + C) & CUT (Ctrl + X)
+
     else if (e.ctrlKey && (e.key.toLowerCase() === 'c' || e.key.toLowerCase() === 'x')) {
         if (!selectedId) return; // Harus ada yang dipilih
         e.preventDefault();
@@ -387,7 +382,7 @@ document.addEventListener('keydown', async (e) => {
         await handleMenuAction(mode);
     }
 
-    // 4. Shortcut DELETE (Delete key)
+
     else if (e.key === 'Delete') {
         if (!selectedId) return;
         e.preventDefault();
@@ -395,7 +390,7 @@ document.addEventListener('keydown', async (e) => {
     }
 });
 
-// Perbaikan Klik Kanan (Context Menu)
+
 document.addEventListener('contextmenu', (e) => {
     const menu = document.getElementById('context-menu');
     const target = e.target.closest('.item-card') || e.target.closest('#folder-tree li');
@@ -421,7 +416,7 @@ document.addEventListener('contextmenu', (e) => {
     }
 });
 
-// Perbaikan Klik Kiri (Agar tidak gampang reset selectedId saat mau klik menu)
+
 document.addEventListener('click', (e) => {
     const menu = document.getElementById('context-menu');
     
@@ -433,7 +428,7 @@ document.addEventListener('click', (e) => {
 
     menu.style.display = 'none';
 
-    // Reset seleksi HANYA jika klik benar-benar di luar item
+
     if (!e.target.closest('.item-card') && !e.target.closest('#folder-tree li')) {
         // Jangan reset jika klik tombol navigasi/search
         if (!e.target.closest('button') && !e.target.closest('input')) {

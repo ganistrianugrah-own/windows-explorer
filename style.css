@@ -5,10 +5,10 @@ body {
     display: flex; 
     height: 100vh; 
     background: #fff; 
-    overflow: hidden; /* Mencegah scroll di seluruh body */
+    overflow: hidden; 
 }
 
-/* --- SIDEBAR KIRI --- */
+
 #sidebar { 
     width: 280px; 
     background: #f6f6f6; 
@@ -27,7 +27,7 @@ body {
     flex-shrink: 0;
 }
 
-/* Area Scrollbar Sidebar */
+
 .sidebar-scroll-area {
     flex: 1;
     overflow-y: auto;
@@ -72,7 +72,7 @@ body {
 
 .folder-icon { margin-right: 8px; font-size: 16px; }
 
-/* --- PANEL KANAN --- */
+
 #main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; }
 
 .address-bar { 
@@ -94,11 +94,11 @@ body {
     display: grid; 
     grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
     gap: 20px; 
-    overflow-y: auto; /* Scrollbar Grid Kanan */
+    overflow-y: auto; 
     align-content: start;
 }
 
-/* Context Menu - Harus Absolute agar nempel kursor */
+
 #context-menu {
     position: absolute;
     background: #fff;
@@ -132,7 +132,7 @@ body {
 }
 
 .item-card {
-    width: 120px; /* Atur lebar tetap */
+    width: 120px; 
     text-align: center;
     padding: 10px;
     overflow: hidden;
@@ -142,12 +142,12 @@ body {
     width: 100%;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; /* Ini yang bikin nama rapi pakai ... */
+    text-overflow: ellipsis; 
     margin-top: 5px;
     font-size: 12px;
 }
 
-/* Biar kalau di-hover muncul nama lengkapnya */
+
 .item-card:hover .name {
     white-space: normal;
     word-break: break-all;
@@ -180,8 +180,8 @@ body {
 .breadcrumb-item {
     padding: 2px 6px;
     border-radius: 4px;
-    cursor: pointer; /* Kursor tangan */
-    color: #0078d7;  /* Warna biru link */
+    cursor: pointer; 
+    color: #0078d7;  
     transition: background 0.2s;
 }
 
@@ -205,7 +205,7 @@ body {
     border: 1px solid #0078d7 !important;
 }
 
-/* Scrollbar Styling */
+
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: #aaa; }
